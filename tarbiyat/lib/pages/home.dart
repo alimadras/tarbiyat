@@ -6,33 +6,23 @@ import 'package:tarbiyat/services/menu.dart';
 import 'package:http/http.dart';
 import 'dart:convert';
 import 'package:intl/intl.dart';
+import 'package:tarbiyat/pages/login.dart';
 
 class Home extends StatefulWidget {
+  final Map udata;
+  Home(this.udata);
+
   @override
   State<Home> createState() => _HomeState();
 }
 
 class _HomeState extends State<Home> {
-  Map udata = {};
-
-  //check login
-  Future<void> _checkloc() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    String itsid = prefs.getString('itsid') ?? '0';
-    if (itsid != '0') {
-      udata = jsonDecode(itsid);
-      print(udata['itsid']);
-    } else {
-      Navigator.pushReplacementNamed(context, '/login');
-    }
-  }
-
   //get quran data
   Future<void> getQuran() async {
     DateTime now = DateTime.now();
     String today = DateFormat('d/M/y').format(now);
     String monthstart = '01/' + DateFormat('M/y').format(now);
-    String itsid = udata['itsid'];
+    String itsid = widget.udata['itsid'];
     var url = Uri.parse(
         'http://139.59.31.87/horizons/quranjson.php?itsID=$itsid&from=$monthstart&to=$today');
     Response response = await get(url);
@@ -58,12 +48,16 @@ class _HomeState extends State<Home> {
   @override
   void initState() {
     super.initState();
-    _checkloc();
+    if (widget.udata['itsid'] == '0') {
+      Future(() {
+        Navigator.popAndPushNamed(context, '/login');
+      });
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    String itsid = udata['itsid'];
+    String itsid = widget.udata['itsid'];
     return Scaffold(
       appBar: AppBar(
         title: Text('iMSB for Students'),
