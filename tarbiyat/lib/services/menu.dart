@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class NavDrawer extends StatelessWidget {
+  final Map udata;
+  NavDrawer(this.udata);
+
   void _remloc(context) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     prefs.remove('itsid');
@@ -10,6 +13,7 @@ class NavDrawer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    String itsid = udata['itsid'];
     return Drawer(
       child: ListView(
         padding: EdgeInsets.zero,
@@ -20,9 +24,11 @@ class NavDrawer extends StatelessWidget {
               style: TextStyle(color: Colors.white, fontSize: 25),
             ),
             decoration: BoxDecoration(
-                color: Colors.green,
+                color: Colors.amber,
                 image: DecorationImage(
-                    fit: BoxFit.fill, image: AssetImage('assets/1.jpg'))),
+                    fit: BoxFit.cover,
+                    image: NetworkImage(
+                        'https://idaramsb.net/assets/img/itsphoto.php?itsid=$itsid'))),
           ),
           ListTile(
             leading: Icon(Icons.input),

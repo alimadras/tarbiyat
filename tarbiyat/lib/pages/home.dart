@@ -63,7 +63,7 @@ class _HomeState extends State<Home> {
         title: Text('iMSB for Students'),
         centerTitle: true,
       ),
-      drawer: NavDrawer(),
+      drawer: NavDrawer(widget.udata),
       body: ListView(
         children: [
           Row(

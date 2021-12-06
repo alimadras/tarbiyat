@@ -34,16 +34,16 @@ class _AccountsState extends State<Accounts> {
     itsids += prefs.containsKey('itsid')
         ? prefs.getString('itsid')! + ','
         : '{"itsid":"0","fullname":"Empty"},';
-    itsids += prefs.containsKey('itsid2')
+    itsids += prefs.containsKey('itsid2') || prefs.getString('itsid2') == '0'
         ? prefs.getString('itsid2')! + ','
         : '{"itsid":"0","fullname":"Empty"},';
-    itsids += prefs.containsKey('itsid3')
+    itsids += prefs.containsKey('itsid3') || prefs.getString('itsid3') == '0'
         ? prefs.getString('itsid3')! + ','
         : '{"itsid":"0","fullname":"Empty"},';
-    itsids += prefs.containsKey('itsid4')
+    itsids += prefs.containsKey('itsid4') || prefs.getString('itsid4') == '0'
         ? prefs.getString('itsid4')! + ','
         : '{"itsid":"0","fullname":"Empty"},';
-    itsids += prefs.containsKey('itsid5')
+    itsids += prefs.containsKey('itsid5') || prefs.getString('itsid5') == '0'
         ? prefs.getString('itsid5')! + ','
         : '{"itsid":"0","fullname":"Empty"},';
     itsids = itsids.substring(0, itsids.length - 1);
@@ -135,7 +135,7 @@ class _AccountsState extends State<Accounts> {
         title: Text('Manage Accounts'),
         centerTitle: true,
       ),
-      drawer: NavDrawer(),
+      drawer: NavDrawer(widget.udata),
       body: ListView(
         children: [
           for (var i in itsidsl)
