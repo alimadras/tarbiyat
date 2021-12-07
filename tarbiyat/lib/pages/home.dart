@@ -33,14 +33,14 @@ class _HomeState extends State<Home> {
   }
 
   List<Daction> actions = [
-    Daction(text: 'Fajr Namaz', buttons: 'Imamat,Adaa,Qazaa'),
+    Daction(text: 'Fajr Namaz', buttons: 'امامة,اداء,قضاء,No'),
     Daction(text: 'Siwaak', buttons: 'No,Yes'),
     Daction(text: 'Gusul/Nazafat', buttons: 'Yes,No'),
     Daction(text: 'Waledain Salaam', buttons: 'Yes,No'),
     Daction(text: 'Tilawat al Quran', buttons: 'Yes,No'),
-    Daction(text: 'Zohr Asr Namaz', buttons: 'Imamat,Adaa,Qazaa'),
+    Daction(text: 'Zohr Asr Namaz', buttons: 'امامة,اداء,قضاء,No'),
     Daction(text: 'Homework', buttons: 'Yes,No'),
-    Daction(text: 'Maghrib Isha Namaz', buttons: 'Imamat,Adaa,Qazaa'),
+    Daction(text: 'Maghrib Isha Namaz', buttons: 'امامة,اداء,قضاء,No'),
     Daction(text: 'Wazifatul Layl', buttons: 'Yes,No'),
     Daction(text: 'Siwaak', buttons: 'Yes,No')
   ];

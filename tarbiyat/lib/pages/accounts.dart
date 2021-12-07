@@ -14,23 +14,53 @@ class Accounts extends StatefulWidget {
 class _AccountsState extends State<Accounts> {
   Map udata = {};
 
-  // //check login
-  // _checkloc() async {
-  //   SharedPreferences prefs = await SharedPreferences.getInstance();
-  //   String itsid = prefs.getString('itsid') ?? '0';
-  //   if (itsid != '0') {
-  //     udata = jsonDecode(itsid);
-  //     // print(udata['itsid']);
-  //   } else {
-  //     Navigator.pushReplacementNamed(context, '/login');
-  //   }
-  // }
+  String _getnetimage(its) {
+    if (its != '0') {
+      return 'https://idaramsb.net/assets/img/itsphoto.php?itsid=$its';
+    } else {
+      return 'http://innovacos.com/wp-content/uploads/2017/01/profile-silhouette-300x300.jpg';
+    }
+  }
+
+  void _remloc(getlocno) async {
+    _getloc(getlocno);
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String itsid5 = prefs.getString('itsid5') ?? '0';
+    String itsid4 = prefs.getString('itsid4') ?? '0';
+    String itsid3 = prefs.getString('itsid3') ?? '0';
+    String itsid2 = prefs.getString('itsid2') ?? '0';
+
+    prefs.remove('itsid');
+    prefs.reload();
+    if (itsid2 != '0') {
+      prefs.setString('itsid', itsid2);
+      udata = jsonDecode(itsid2);
+      prefs.remove('itsid2');
+    }
+    if (itsid3 != '0') {
+      prefs.setString('itsid2', itsid3);
+      prefs.remove('itsid3');
+    }
+    if (itsid4 != '0') {
+      prefs.setString('itsid3', itsid4);
+      prefs.remove('itsid4');
+    }
+    if (itsid5 != '0') {
+      prefs.setString('itsid4', itsid5);
+      prefs.remove('itsid5');
+    }
+    prefs.reload();
+
+    Navigator.of(context)
+        .push(MaterialPageRoute(builder: (context) => Accounts(udata)));
+  }
 
   //get all ids
   List itsidsl = [];
-  Future<void> _getitsids() async {
+  _getitsids() async {
     String itsids = '[';
     SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs.reload();
     itsids += prefs.containsKey('itsid')
         ? prefs.getString('itsid')! + ','
         : '{"itsid":"0","fullname":"Empty"},';
@@ -50,6 +80,7 @@ class _AccountsState extends State<Accounts> {
     itsids += ']';
     print(itsids);
     itsidsl = jsonDecode(itsids);
+    setState(() {});
   }
 
   _getloc(itsid) async {
@@ -96,6 +127,7 @@ class _AccountsState extends State<Accounts> {
         prefs.reload();
       }
       udata = jsonDecode(itsidloc);
+
       return showDialog(
         context: context,
         builder: (ctx) => AlertDialog(
@@ -122,13 +154,13 @@ class _AccountsState extends State<Accounts> {
       Future(() {
         Navigator.popAndPushNamed(context, '/login');
       });
-    }
+    } else {}
   }
 
   @override
   Widget build(BuildContext context) {
-    String itsid = widget.udata['itsid'];
     _getitsids();
+    String itsid = widget.udata['itsid'];
 
     return Scaffold(
       appBar: AppBar(
@@ -136,19 +168,85 @@ class _AccountsState extends State<Accounts> {
         centerTitle: true,
       ),
       drawer: NavDrawer(widget.udata),
+      floatingActionButton: FloatingActionButton(
+          onPressed: () {
+            Navigator.popAndPushNamed(context, '/login');
+          },
+          child: Icon(Icons.add)),
       body: ListView(
         children: [
           for (var i in itsidsl)
-            Card(
-              margin: EdgeInsets.fromLTRB(16.0, 16.0, 16.0, 0),
-              child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    Text(i['itsid'],
-                        style:
-                            TextStyle(fontSize: 18.0, color: Colors.grey[600])),
-                  ]),
-            )
+            i['itsid'] == '0'
+                ? SizedBox(height: 10.0)
+                : Card(
+                    margin: EdgeInsets.fromLTRB(16.0, 16.0, 16.0, 0),
+                    child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          CircleAvatar(
+                            child: ClipOval(
+                                child: Image.network(_getnetimage(i['itsid']))),
+                            radius: 50.0,
+                          ),
+                          Expanded(
+                            child: Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Column(
+                                children: [
+                                  Text(i['fullname'],
+                                      style: TextStyle(
+                                          fontSize: 18.0,
+                                          color: Colors.grey[600])),
+                                  Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceEvenly,
+                                    children: [
+                                      i['itsid'] == itsid
+                                          ? SizedBox(width: 10.0)
+                                          : ElevatedButton(
+                                              onPressed: () {
+                                                setState(() {
+                                                  _getloc(i['itsid']);
+                                                });
+                                              },
+                                              child: Padding(
+                                                padding:
+                                                    const EdgeInsets.all(10.0),
+                                                child: Text('Switch',
+                                                    style: TextStyle(
+                                                        fontFamily:
+                                                            'KanzalMarjaan',
+                                                        fontSize: 20.0,
+                                                        color: Colors.white)),
+                                              )),
+                                      i['itsid'] == itsid
+                                          ? SizedBox(width: 10.0)
+                                          : ElevatedButton(
+                                              onPressed: () {
+                                                setState(() {
+                                                  _remloc(i['itsid']);
+                                                });
+                                              },
+                                              style: ElevatedButton.styleFrom(
+                                                  primary: Colors.redAccent),
+                                              child: Padding(
+                                                padding:
+                                                    const EdgeInsets.all(10.0),
+                                                child: Text('Remove',
+                                                    style: TextStyle(
+                                                        fontFamily:
+                                                            'KanzalMarjaan',
+                                                        fontSize: 20.0,
+                                                        color: Colors.white)),
+                                              )),
+                                    ],
+                                  )
+                                ],
+                              ),
+                            ),
+                          ),
+                        ]),
+                  )
         ],
       ),
     );

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:tarbiyat/pages/accounts.dart';
+import 'package:tarbiyat/pages/home.dart';
 
 class NavDrawer extends StatelessWidget {
   final Map udata;
@@ -8,7 +10,30 @@ class NavDrawer extends StatelessWidget {
   void _remloc(context) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     prefs.remove('itsid');
-    Navigator.pushReplacementNamed(context, '/login');
+    prefs.reload();
+    String itsid5 = prefs.getString('itsid5') ?? '0';
+    String itsid4 = prefs.getString('itsid4') ?? '0';
+    String itsid3 = prefs.getString('itsid3') ?? '0';
+    String itsid2 = prefs.getString('itsid2') ?? '0';
+    if (itsid2 != '0') {
+      prefs.setString('itsid', itsid2);
+      prefs.remove('itsid2');
+    }
+    if (itsid3 != '0') {
+      prefs.setString('itsid2', itsid3);
+      prefs.remove('itsid3');
+    }
+    if (itsid4 != '0') {
+      prefs.setString('itsid3', itsid4);
+      prefs.remove('itsid4');
+    }
+    if (itsid5 != '0') {
+      prefs.setString('itsid4', itsid5);
+      prefs.remove('itsid5');
+    }
+    prefs.reload();
+    Navigator.of(context)
+        .pushNamedAndRemoveUntil('/login', (Route<dynamic> route) => false);
   }
 
   @override
@@ -32,8 +57,11 @@ class NavDrawer extends StatelessWidget {
           ),
           ListTile(
             leading: Icon(Icons.input),
-            title: Text('Welcome'),
-            onTap: () => {},
+            title: Text('Home'),
+            onTap: () => {
+              Navigator.of(context)
+                  .push(MaterialPageRoute(builder: (context) => Home(udata)))
+            },
           ),
           ListTile(
             leading: Icon(Icons.verified_user),
@@ -48,7 +76,10 @@ class NavDrawer extends StatelessWidget {
           ListTile(
             leading: Icon(Icons.border_color),
             title: Text('Manage Accounts'),
-            onTap: () => {Navigator.pushReplacementNamed(context, '/accounts')},
+            onTap: () => {
+              Navigator.of(context).push(
+                  MaterialPageRoute(builder: (context) => Accounts(udata)))
+            },
           ),
           ListTile(
             leading: Icon(Icons.exit_to_app),

@@ -7,14 +7,14 @@ class ActionCard extends StatelessWidget {
   ActionCard({required this.action, required this.delete});
 
   Color _getColour(i) {
-    Color colour = i == 'Imamat'
+    Color colour = i == 'امامة'
         ? Colors.amber
-        : i == 'Adaa'
+        : i == 'اداء'
             ? Colors.greenAccent
             : i == 'No'
                 ? Colors.redAccent
-                : i == 'Qadhaa'
-                    ? Colors.redAccent
+                : i == 'قضاء'
+                    ? Colors.grey
                     : i == 'Yes'
                         ? Colors.greenAccent
                         : Colors.grey;
@@ -44,7 +44,9 @@ class ActionCard extends StatelessWidget {
                       padding: const EdgeInsets.all(10.0),
                       child: Text(i,
                           style: TextStyle(
-                              fontSize: 14.0, color: Colors.grey[800])),
+                              fontFamily: 'KanzalMarjaan',
+                              fontSize: 20.0,
+                              color: Colors.grey[800])),
                     ),
                   )
               ],
