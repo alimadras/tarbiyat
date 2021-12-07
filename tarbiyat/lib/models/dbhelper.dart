@@ -11,21 +11,43 @@ class DBHelper {
   DBHelper._privateConstructor();
   static final DBHelper instance = DBHelper._privateConstructor();
 
-  static Database _database;
+  static Database? _database;
   Future<Database> get database async {
-    if (_database != null) {
-      return _database;
-    } else {
-      _database = await _initiateDatabase();
-      return _database;
-    }
+    if (_database != null) return _database!;
+    _database = await _initiateDatabase();
+    return _database!;
   }
 
   _initiateDatabase() async {
     Directory directory = await getApplicationDocumentsDirectory();
     String path = join(directory.path, _dbName);
-    await openDatabase(path, version: _dbVersion, onCreate:);
+    await openDatabase(path, version: _dbVersion, onCreate: _Oncreate);
+  }
 
+  _Oncreate(Database db, int version) {
+    db.query('''
+      CREATE TABLE routine (id INTEGER PRIMARY KEY, cdate TEXT, title TEXT, buttons TEXT, status INTEGER)
+      ''');
+  }
 
+  Future<int> insert(Map<String, dynamic> row) async {
+    Database db = await instance.database;
+    return await db.insert('routine', row);
+  }
+
+  Future<List<Map<String, dynamic>>> queryAll() async {
+    Database db = await instance.database;
+    return await db.query('routine');
+  }
+
+  Future<int> update(Map<String, dynamic> row) async {
+    Database db = await instance.database;
+    int id = row['id'];
+    return await db.update('routine', row, where: 'id = ?', whereArgs: [id]);
+  }
+
+  Future<int> delete(int id) async {
+    Database db = await instance.database;
+    return await db.delete('routine', where: 'id = ?', whereArgs: [id]);
   }
 }
