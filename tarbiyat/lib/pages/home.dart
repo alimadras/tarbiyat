@@ -34,7 +34,7 @@ class _HomeState extends State<Home> {
   }
 
   _getroutine() async {
-    actions = [];
+    // actions = [];
     // int insertest = await DBHelper.instance.insert(
     //     {'cdate': '2021-12-08', 'title': '', 'buttons': '', 'status': 1});
     // print(insertest);
@@ -136,7 +136,7 @@ class _HomeState extends State<Home> {
                     // actions.remove(i);
                     // =Daction(id: i.id, text: i.text, buttons: 'Change,');
                     // actions = [];
-                    _getroutine();
+                    // _getroutine();
                   });
                 }),
         ],
