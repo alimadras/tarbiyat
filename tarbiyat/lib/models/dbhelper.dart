@@ -25,10 +25,14 @@ class DBHelper {
   }
 
   _Oncreate(Database db, int version) {
-    db.query('''
-      CREATE TABLE routine (id INTEGER PRIMARY KEY, cdate TEXT, title TEXT, buttons TEXT, status INTEGER)
+    db.execute('''
+      CREATE TABLE routine (id INTEGER PRIMARY KEY, cdate TEXT, title TEXT, buttons TEXT, status INTEGER);
+      INSERT into routine(cdate,title,buttons,status) values('2021-12-08','Fajr Namaz','امامة,اداء,قضاء,No',1);
       ''');
   }
+
+  // int i =
+  // insert({'cdate': '2021-12-08', 'title': '', 'buttons': '', 'status': 1});
 
   Future<int> insert(Map<String, dynamic> row) async {
     Database db = await instance.database;
