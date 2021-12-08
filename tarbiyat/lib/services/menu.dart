@@ -52,8 +52,11 @@ class NavDrawer extends StatelessWidget {
                 color: Colors.amber,
                 image: DecorationImage(
                     fit: BoxFit.cover,
-                    image: NetworkImage(
-                        'https://idaramsb.net/assets/img/itsphoto.php?itsid=$itsid'))),
+                    image: itsid == '0'
+                        ? NetworkImage(
+                            'http://innovacos.com/wp-content/uploads/2017/01/profile-silhouette-300x300.jpg')
+                        : NetworkImage(
+                            'https://idaramsb.net/assets/img/itsphoto.php?itsid=$itsid'))),
           ),
           ListTile(
             leading: Icon(Icons.input),

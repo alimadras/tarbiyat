@@ -7,6 +7,7 @@ import 'package:http/http.dart';
 import 'dart:convert';
 import 'package:intl/intl.dart';
 import 'package:tarbiyat/pages/login.dart';
+import 'package:tarbiyat/models/dbhelper.dart';
 
 class Home extends StatefulWidget {
   final Map udata;
@@ -32,18 +33,57 @@ class _HomeState extends State<Home> {
     print(data['result']);
   }
 
-  List<Daction> actions = [
-    Daction(text: 'Fajr Namaz', buttons: 'امامة,اداء,قضاء,No'),
-    Daction(text: 'Siwaak', buttons: 'No,Yes'),
-    Daction(text: 'Gusul/Nazafat', buttons: 'Yes,No'),
-    Daction(text: 'Waledain Salaam', buttons: 'Yes,No'),
-    Daction(text: 'Tilawat al Quran', buttons: 'Yes,No'),
-    Daction(text: 'Zohr Asr Namaz', buttons: 'امامة,اداء,قضاء,No'),
-    Daction(text: 'Homework', buttons: 'Yes,No'),
-    Daction(text: 'Maghrib Isha Namaz', buttons: 'امامة,اداء,قضاء,No'),
-    Daction(text: 'Wazifatul Layl', buttons: 'Yes,No'),
-    Daction(text: 'Siwaak', buttons: 'Yes,No')
-  ];
+  _getroutine() async {
+    actions = [];
+    // int insertest = await DBHelper.instance.insert(
+    //     {'cdate': '2021-12-08', 'title': '', 'buttons': '', 'status': 1});
+    // print(insertest);
+    List<Map<String, dynamic>> routine =
+        await DBHelper.instance.queryAll('routine');
+    print(routine);
+    List<Map> answers = await DBHelper.instance.queryRaw(
+        "SELECT * from answers where status = 1 and date(adatetime) = date('now') and its = ?",
+        [widget.udata['itsid']]);
+    print(answers);
+    for (var i = 0; i < routine.length; i++) {
+      int cr = 1;
+      String answer = '';
+      for (var j = 0; j < answers.length; j++) {
+        if (answers[j]['rid'] == routine[i]['id']) {
+          cr = 0;
+          answer = answers[j]['buttons'];
+        }
+      }
+      if (cr == 1) {
+        actions.add(Daction(
+            id: routine[i]['id'],
+            text: routine[i]['title'],
+            buttons: routine[i]['buttons']));
+      } else {
+        actions.add(Daction(
+            id: routine[i]['id'],
+            text: routine[i]['title'],
+            buttons: "Change," + answer));
+      }
+    }
+    setState(() {});
+  }
+
+  List<Daction> actions = [];
+
+  // [
+
+  //   Daction(text: 'Fajr Namaz', buttons: 'امامة,اداء,قضاء,No'),
+  //   Daction(text: 'Siwaak', buttons: 'No,Yes'),
+  //   Daction(text: 'Gusul/Nazafat', buttons: 'Yes,No'),
+  //   Daction(text: 'Waledain Salaam', buttons: 'Yes,No'),
+  //   Daction(text: 'Tilawat al Quran', buttons: 'Yes,No'),
+  //   Daction(text: 'Zohr Asr Namaz', buttons: 'امامة,اداء,قضاء,No'),
+  //   Daction(text: 'Homework', buttons: 'Yes,No'),
+  //   Daction(text: 'Maghrib Isha Namaz', buttons: 'امامة,اداء,قضاء,No'),
+  //   Daction(text: 'Wazifatul Layl', buttons: 'Yes,No'),
+  //   Daction(text: 'Siwaak', buttons: 'Yes,No')
+  // ];
 
   @override
   void initState() {
@@ -52,12 +92,17 @@ class _HomeState extends State<Home> {
       Future(() {
         Navigator.popAndPushNamed(context, '/login');
       });
+    } else {
+      setState(() {
+        _getroutine();
+      });
     }
   }
 
   @override
   Widget build(BuildContext context) {
     String itsid = widget.udata['itsid'];
+
     return Scaffold(
       appBar: AppBar(
         title: Text('iMSB for Students'),
@@ -70,8 +115,10 @@ class _HomeState extends State<Home> {
             children: [
               Expanded(
                   child: Container(
-                      child: Image.network(
-                          'https://idaramsb.net/assets/img/itsphoto.php?itsid=$itsid'),
+                      child: itsid == '0'
+                          ? SizedBox(width: 10.0)
+                          : Image.network(
+                              'https://idaramsb.net/assets/img/itsphoto.php?itsid=$itsid'),
                       color: Colors.amber,
                       padding: EdgeInsets.all(5.0))),
               Container(
@@ -79,7 +126,19 @@ class _HomeState extends State<Home> {
               Container(color: Colors.grey, padding: EdgeInsets.all(20.0)),
             ],
           ),
-          for (var i in actions) ActionCard(action: i, delete: () {}),
+          for (var i in actions)
+            ActionCard(
+                action: i,
+                itsid: itsid,
+                change: () {
+                  setState(() {
+                    // var j = actions.indexOf(i);
+                    // actions.remove(i);
+                    // =Daction(id: i.id, text: i.text, buttons: 'Change,');
+                    // actions = [];
+                    _getroutine();
+                  });
+                }),
         ],
       ),
     );
