@@ -8,6 +8,7 @@ import 'dart:convert';
 import 'package:intl/intl.dart';
 import 'package:tarbiyat/pages/login.dart';
 import 'package:tarbiyat/models/dbhelper.dart';
+import 'package:tarbiyat/services/local_notification.dart';
 
 class Home extends StatefulWidget {
   final Map udata;
@@ -33,6 +34,8 @@ class _HomeState extends State<Home> {
     print(data['result']);
   }
 
+  List<Daction> tactions = [];
+
   _getroutine() async {
     // actions = [];
     // int insertest = await DBHelper.instance.insert(
@@ -54,6 +57,10 @@ class _HomeState extends State<Home> {
           answer = answers[j]['buttons'];
         }
       }
+      tactions.add(Daction(
+          id: routine[i]['id'],
+          text: routine[i]['title'],
+          buttons: routine[i]['buttons']));
       if (cr == 1) {
         actions.add(Daction(
             id: routine[i]['id'],
@@ -122,7 +129,16 @@ class _HomeState extends State<Home> {
                       color: Colors.amber,
                       padding: EdgeInsets.all(5.0))),
               Container(
-                  color: Colors.pinkAccent, padding: EdgeInsets.all(20.0)),
+                  child: ElevatedButton(
+                      onPressed: () {
+                        NotificationApi.showNotification(
+                            title: 'Sarah Abs',
+                            body: 'Hey there wachha doing?',
+                            payload: 'sarab.abs');
+                      },
+                      child: Text('Notify')),
+                  color: Colors.pinkAccent,
+                  padding: EdgeInsets.all(20.0)),
               Container(color: Colors.grey, padding: EdgeInsets.all(20.0)),
             ],
           ),
@@ -130,13 +146,26 @@ class _HomeState extends State<Home> {
             ActionCard(
                 action: i,
                 itsid: itsid,
-                change: () {
+                change: (btnstring) {
+                  var m = 0;
+                  for (var l = 0; l < tactions.length; l++) {
+                    if (i.id == tactions[l].id) {
+                      m = l;
+                      print('it got here?');
+                    }
+                  }
+                  print(m);
                   setState(() {
-                    // var j = actions.indexOf(i);
+                    var j = actions.indexOf(i);
                     // actions.remove(i);
-                    // =Daction(id: i.id, text: i.text, buttons: 'Change,');
-                    // actions = [];
-                    // _getroutine();
+                    btnstring is String
+                        ? actions[j] = Daction(
+                            id: i.id,
+                            text: i.text,
+                            buttons: 'Change,$btnstring')
+                        : actions[j] = tactions[m];
+                    //actions = [];
+                    //_getroutine();
                   });
                 }),
         ],

@@ -2,7 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:tarbiyat/pages/home.dart';
 import 'package:tarbiyat/pages/login.dart';
 import 'package:tarbiyat/pages/accounts.dart';
+import 'package:tarbiyat/services/local_notification.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+
 import 'dart:convert';
 
 void main() async {

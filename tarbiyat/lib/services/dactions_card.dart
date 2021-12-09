@@ -7,6 +7,11 @@ class ActionCard extends StatelessWidget {
   final itsid;
   final Function change;
   ActionCard({required this.action, required this.itsid, required this.change});
+  _getbtnstring() async {
+    List<Map> btnstringet = await DBHelper.instance
+        .queryRaw("select * from routine where id = ?", [action.id]);
+    return btnstringet;
+  }
 
   Color _getColour(i) {
     Color colour = i == 'امامة'
@@ -51,7 +56,8 @@ class ActionCard extends StatelessWidget {
                               DBHelper.instance.updateRaw(
                                   "update answers set status = ? where rid = ? and date(adatetime) = DATE('now') and its = ?",
                                   [0, rid, itsid]);
-                            change();
+
+                            change(action);
                           },
                           style:
                               ElevatedButton.styleFrom(primary: _getColour(i)),
@@ -78,7 +84,7 @@ class ActionCard extends StatelessWidget {
                               'buttons': '$i',
                               'status': 1
                             });
-                            change();
+                            change(i);
                           },
                           style:
                               ElevatedButton.styleFrom(primary: _getColour(i)),
