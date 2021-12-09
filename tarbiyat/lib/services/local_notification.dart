@@ -1,30 +1,13 @@
-import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:awesome_notifications/awesome_notifications.dart';
 
-class NotificationApi {
-  static final _notifications = FlutterLocalNotificationsPlugin();
-
-  static Future _notificationDetails() async {
-    return NotificationDetails(
-      android: AndroidNotificationDetails(
-        'channel id',
-        'channel name',
-        importance: Importance.max,
-      ),
-      iOS: IOSNotificationDetails(),
-    );
-  }
-
-  static Future showNotification({
-    int id = 0,
-    String? title,
-    String? body,
-    String? payload,
-  }) async =>
-      _notifications.show(
-        id,
-        title,
-        body,
-        await _notificationDetails(),
-        payload: payload,
-      );
+Future<void> createNot() async {
+  await AwesomeNotifications().createNotification(
+      content: NotificationContent(
+    id: 4,
+    channelKey: 'basic_channel',
+    title: '${Emojis.building_kaaba} Reminder to fill your Tarbiyat details',
+    body:
+        'Perseverence is key to shaping Akhlaaq. Don\'t forget to fill the details of tarbiyat now!',
+    notificationLayout: NotificationLayout.Messaging,
+  ));
 }

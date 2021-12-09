@@ -1,14 +1,15 @@
+import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:flutter/material.dart';
 import 'package:tarbiyat/services/dactions.dart';
 import 'package:tarbiyat/services/dactions_card.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tarbiyat/services/menu.dart';
+import 'package:tarbiyat/services/local_notification.dart';
 import 'package:http/http.dart';
 import 'dart:convert';
 import 'package:intl/intl.dart';
 import 'package:tarbiyat/pages/login.dart';
 import 'package:tarbiyat/models/dbhelper.dart';
-import 'package:tarbiyat/services/local_notification.dart';
 
 class Home extends StatefulWidget {
   final Map udata;
@@ -95,6 +96,32 @@ class _HomeState extends State<Home> {
   @override
   void initState() {
     super.initState();
+    AwesomeNotifications().isNotificationAllowed().then((isAllowed) {
+      if (!isAllowed) {
+        showDialog(
+            context: context,
+            builder: (context) => AlertDialog(
+                    title: Text('Allow Notifications'),
+                    content:
+                        Text('Our app would like to send you notifications'),
+                    actions: [
+                      TextButton(
+                          onPressed: () {
+                            AwesomeNotifications()
+                                .requestPermissionToSendNotifications()
+                                .then((_) => Navigator.pop(context));
+                          },
+                          child: Text('Allow',
+                              style: TextStyle(color: Colors.blueAccent))),
+                      TextButton(
+                          onPressed: () {
+                            Navigator.pop(context);
+                          },
+                          child: Text('Don\'t Allow',
+                              style: TextStyle(color: Colors.grey)))
+                    ]));
+      }
+    });
     if (widget.udata['itsid'] == '0') {
       Future(() {
         Navigator.popAndPushNamed(context, '/login');
@@ -131,10 +158,7 @@ class _HomeState extends State<Home> {
               Container(
                   child: ElevatedButton(
                       onPressed: () {
-                        NotificationApi.showNotification(
-                            title: 'Sarah Abs',
-                            body: 'Hey there wachha doing?',
-                            payload: 'sarab.abs');
+                        createNot();
                       },
                       child: Text('Notify')),
                   color: Colors.pinkAccent,

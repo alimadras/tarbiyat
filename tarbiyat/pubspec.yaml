@@ -34,7 +34,7 @@ dependencies:
   intl: ^0.17.0
   sqflite:
   path_provider:
-  flutter_local_notifications: ^9.1.4
+  awesome_notifications: ^0.0.6+10
 
 
 

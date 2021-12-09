@@ -2,14 +2,21 @@ import 'package:flutter/material.dart';
 import 'package:tarbiyat/pages/home.dart';
 import 'package:tarbiyat/pages/login.dart';
 import 'package:tarbiyat/pages/accounts.dart';
-import 'package:tarbiyat/services/local_notification.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-
+import 'package:awesome_notifications/awesome_notifications.dart';
 import 'dart:convert';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  AwesomeNotifications().initialize('resource://drawable/idara_logo', [
+    NotificationChannel(
+      channelKey: 'basic_channel',
+      channelName: 'Basic Notifications',
+      defaultColor: Colors.blueAccent,
+      importance: NotificationImportance.High,
+      channelShowBadge: true,
+    )
+  ]);
   Map udata = {};
   SharedPreferences prefs = await SharedPreferences.getInstance();
   String getcurrentuser = prefs.getString('itsid') ?? '0';
