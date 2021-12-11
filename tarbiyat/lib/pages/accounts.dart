@@ -50,9 +50,6 @@ class _AccountsState extends State<Accounts> {
       prefs.remove('itsid5');
     }
     prefs.reload();
-
-    // Navigator.of(context)
-    //     .push(MaterialPageRoute(builder: (context) => Accounts(udata)));
   }
 
   //get all ids

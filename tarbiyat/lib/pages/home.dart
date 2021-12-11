@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:io';
-
 import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:flutter/material.dart';
 import 'package:internet_connection_checker/internet_connection_checker.dart';
@@ -48,10 +47,6 @@ class _HomeState extends State<Home> {
   List<Daction> tactions = [];
 
   _getroutine() async {
-    // actions = [];
-    // int insertest = await DBHelper.instance.insert(
-    //     {'cdate': '2021-12-08', 'title': '', 'buttons': '', 'status': 1});
-    // print(insertest);
     List<Map<String, dynamic>> routine =
         await DBHelper.instance.queryAll('routine');
     print(routine);
@@ -88,21 +83,6 @@ class _HomeState extends State<Home> {
   }
 
   List<Daction> actions = [];
-
-  // [
-
-  //   Daction(text: 'Fajr Namaz', buttons: 'امامة,اداء,قضاء,No'),
-  //   Daction(text: 'Siwaak', buttons: 'No,Yes'),
-  //   Daction(text: 'Gusul/Nazafat', buttons: 'Yes,No'),
-  //   Daction(text: 'Waledain Salaam', buttons: 'Yes,No'),
-  //   Daction(text: 'Tilawat al Quran', buttons: 'Yes,No'),
-  //   Daction(text: 'Zohr Asr Namaz', buttons: 'امامة,اداء,قضاء,No'),
-  //   Daction(text: 'Homework', buttons: 'Yes,No'),
-  //   Daction(text: 'Maghrib Isha Namaz', buttons: 'امامة,اداء,قضاء,No'),
-  //   Daction(text: 'Wazifatul Layl', buttons: 'Yes,No'),
-  //   Daction(text: 'Siwaak', buttons: 'Yes,No')
-  // ];
-
   @override
   void initState() {
     super.initState();
@@ -224,15 +204,12 @@ class _HomeState extends State<Home> {
                   print(m);
                   setState(() {
                     var j = actions.indexOf(i);
-                    // actions.remove(i);
                     btnstring is String
                         ? actions[j] = Daction(
                             id: i.id,
                             text: i.text,
                             buttons: 'Change,$btnstring')
                         : actions[j] = tactions[m];
-                    //actions = [];
-                    //_getroutine();
                   });
                 }),
         ],
