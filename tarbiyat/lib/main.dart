@@ -15,11 +15,18 @@ void main() async {
       defaultColor: Colors.blueAccent,
       importance: NotificationImportance.High,
       channelShowBadge: true,
-    )
+    ),
+    NotificationChannel(
+      channelKey: 'scheduled_channel',
+      channelName: 'Scheduled Notifications',
+      defaultColor: Colors.blueAccent,
+      importance: NotificationImportance.High,
+      locked: true,
+    ),
   ]);
   Map udata = {};
   SharedPreferences prefs = await SharedPreferences.getInstance();
-  String getcurrentuser = prefs.getString('itsid') ?? '0';
+  String getcurrentuser = prefs.getString('itsid1') ?? '0';
   if (getcurrentuser == '0') {
     udata = {"itsid": "0"};
   } else {

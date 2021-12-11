@@ -33,7 +33,7 @@ class _AccountsState extends State<Accounts> {
     prefs.remove('itsid');
     prefs.reload();
     if (itsid2 != '0') {
-      prefs.setString('itsid', itsid2);
+      prefs.setString('itsid1', itsid2);
       udata = jsonDecode(itsid2);
       prefs.remove('itsid2');
     }
@@ -51,8 +51,8 @@ class _AccountsState extends State<Accounts> {
     }
     prefs.reload();
 
-    Navigator.of(context)
-        .push(MaterialPageRoute(builder: (context) => Accounts(udata)));
+    // Navigator.of(context)
+    //     .push(MaterialPageRoute(builder: (context) => Accounts(udata)));
   }
 
   //get all ids
@@ -61,8 +61,8 @@ class _AccountsState extends State<Accounts> {
     String itsids = '[';
     SharedPreferences prefs = await SharedPreferences.getInstance();
     prefs.reload();
-    itsids += prefs.containsKey('itsid')
-        ? prefs.getString('itsid')! + ','
+    itsids += prefs.containsKey('itsid1')
+        ? prefs.getString('itsid1')! + ','
         : '{"itsid":"0","fullname":"Empty"},';
     itsids += prefs.containsKey('itsid2') || prefs.getString('itsid2') == '0'
         ? prefs.getString('itsid2')! + ','
@@ -86,82 +86,75 @@ class _AccountsState extends State<Accounts> {
   _getloc(itsid) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     prefs.reload();
-    String itsid5 = prefs.getString('itsid5') ?? '0';
-    String itsid4 = prefs.getString('itsid4') ?? '0';
-    String itsid3 = prefs.getString('itsid3') ?? '0';
-    String itsid2 = prefs.getString('itsid2') ?? '0';
-    String itsid1 = prefs.getString('itsid') ?? '0';
-    Map mitsid5 = itsid5 != '0' ? jsonDecode(itsid5) : {"itsid": "0"};
-    Map mitsid4 = itsid4 != '0' ? jsonDecode(itsid4) : {"itsid": "0"};
-    Map mitsid3 = itsid3 != '0' ? jsonDecode(itsid3) : {"itsid": "0"};
-    Map mitsid2 = itsid2 != '0' ? jsonDecode(itsid2) : {"itsid": "0"};
-    Map mitsid1 = itsid1 != '0' ? jsonDecode(itsid1) : {"itsid": "0"};
-    String itsidloc = itsid1;
-    if (itsid == mitsid5['itsid'] ||
-        itsid == mitsid4['itsid'] ||
-        itsid == mitsid3['itsid'] ||
-        itsid == mitsid2['itsid'] ||
-        itsid == mitsid1['itsid']) {
-      if (itsid == mitsid5['itsid']) {
-        itsidloc = itsid5;
-        prefs.setString('itsid', itsidloc);
-        prefs.setString('itsid5', itsid1);
-        prefs.reload();
-      }
-      if (itsid == mitsid4['itsid']) {
-        itsidloc = itsid4;
-        prefs.setString('itsid', itsidloc);
-        prefs.setString('itsid4', itsid1);
-        prefs.reload();
-      }
-      if (itsid == mitsid3['itsid']) {
-        itsidloc = itsid3;
-        prefs.setString('itsid', itsidloc);
-        prefs.setString('itsid3', itsid1);
-        prefs.reload();
-      }
-      if (itsid == mitsid2['itsid']) {
-        itsidloc = itsid2;
-        prefs.setString('itsid', itsidloc);
-        prefs.setString('itsid2', itsid1);
-        prefs.reload();
-      }
-      udata = jsonDecode(itsidloc);
+    List<String> itsidlist = [];
+    String itsidliststring = '[';
+    itsidlist
+        .add(prefs.getString('itsid1') ?? '{"itsid":"0","fullname":"Empty"}');
+    itsidlist
+        .add(prefs.getString('itsid2') ?? '{"itsid":"0","fullname":"Empty"}');
+    itsidlist
+        .add(prefs.getString('itsid3') ?? '{"itsid":"0","fullname":"Empty"}');
+    itsidlist
+        .add(prefs.getString('itsid4') ?? '{"itsid":"0","fullname":"Empty"}');
+    itsidlist
+        .add(prefs.getString('itsid5') ?? '{"itsid":"0","fullname":"Empty"}');
 
-      return showDialog(
-        context: context,
-        builder: (ctx) => AlertDialog(
-          title: Text("Success"),
-          content: Text("Account switched"),
-          actions: <Widget>[
-            ElevatedButton(
-              onPressed: () {
-                Navigator.of(context).push(
-                    MaterialPageRoute(builder: (context) => Accounts(udata)));
-              },
-              child: Text("OK"),
-            ),
-          ],
-        ),
-      );
+    for (int i = 0; i < itsidlist.length; i++) {
+      Map itsdet = jsonDecode(itsidlist[i]);
+      String itstemp = '';
+      int j = i + 1;
+      if (itsid == itsdet['itsid']) {
+        itstemp = itsidlist[0];
+        itsidlist[0] = itsidlist[i];
+        itsidlist[i] = itstemp;
+        prefs.setString('itsid1', itsidlist[0]);
+        prefs.setString('itsid' + j.toString(), itsidlist[i]);
+      }
     }
+    for (var k = 0; k < itsidlist.length; k++) {
+      itsidliststring += itsidlist[k] + ',';
+    }
+    itsidliststring = itsidliststring.substring(0, itsidliststring.length - 1);
+    itsidliststring += ']';
+
+    udata = jsonDecode(itsidlist[0]);
+    itsidsl = jsonDecode(itsidliststring);
+    // return showDialog(
+    //   context: context,
+    //   builder: (ctx) => AlertDialog(
+    //     title: Text("Success"),
+    //     content: Text("Account switched"),
+    //     actions: <Widget>[
+    //       ElevatedButton(
+    //         onPressed: () {
+    Navigator.of(context)
+        .push(MaterialPageRoute(builder: (context) => Accounts(udata)));
+    //         },
+    //         child: Text("OK"),
+    //       ),
+    //     ],
+    //   ),
+    // );
   }
 
   @override
   void initState() {
     super.initState();
-    if (widget.udata['itsid'] == 0) {
+    if (widget.udata['itsid'] == '0') {
       Future(() {
         Navigator.popAndPushNamed(context, '/login');
       });
-    } else {}
+    } else {
+      _getitsids();
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    _getitsids();
     String itsid = widget.udata['itsid'];
-
+    if (itsidsl.length == 0) {
+      _getitsids();
+    }
     return Scaffold(
       appBar: AppBar(
         title: Text('Manage Accounts'),

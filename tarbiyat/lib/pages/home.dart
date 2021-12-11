@@ -1,15 +1,19 @@
+import 'dart:async';
+import 'dart:io';
+
 import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:flutter/material.dart';
+import 'package:internet_connection_checker/internet_connection_checker.dart';
 import 'package:tarbiyat/services/dactions.dart';
 import 'package:tarbiyat/services/dactions_card.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tarbiyat/services/menu.dart';
 import 'package:tarbiyat/services/local_notification.dart';
 import 'package:http/http.dart';
 import 'dart:convert';
 import 'package:intl/intl.dart';
-import 'package:tarbiyat/pages/login.dart';
+import 'package:tarbiyat/pages/accounts.dart';
 import 'package:tarbiyat/models/dbhelper.dart';
+import 'package:tarbiyat/services/utlities.dart';
 
 class Home extends StatefulWidget {
   final Map udata;
@@ -20,19 +24,25 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
+  bool hasInternet = false;
   //get quran data
   Future<void> getQuran() async {
     DateTime now = DateTime.now();
     String today = DateFormat('d/M/y').format(now);
     String monthstart = '01/' + DateFormat('M/y').format(now);
     String itsid = widget.udata['itsid'];
-    var url = Uri.parse(
-        'http://139.59.31.87/horizons/quranjson.php?itsID=$itsid&from=$monthstart&to=$today');
-    Response response = await get(url);
+    hasInternet = await InternetConnectionChecker().hasConnection;
+    if (hasInternet) {
+      var url = Uri.parse(
+          'http://139.59.31.87/horizons/quranjson.php?itsID=$itsid&from=$monthstart&to=$today');
+      Response response = await get(url);
 
-    Map data =
-        jsonDecode(response.body.replaceAll('[', '').replaceAll(']', ''));
-    print(data['result']);
+      Map data =
+          jsonDecode(response.body.replaceAll('[', '').replaceAll(']', ''));
+      print(data['result']);
+    } else {
+      print('No Internet');
+    }
   }
 
   List<Daction> tactions = [];
@@ -122,6 +132,20 @@ class _HomeState extends State<Home> {
                     ]));
       }
     });
+    AwesomeNotifications().createdStream.listen((notification) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text('Notification created on ${notification.channelKey}')));
+    });
+    AwesomeNotifications().actionStream.listen((notification) {
+      if (notification.channelKey == 'basic_channel' && Platform.isIOS) {
+        AwesomeNotifications().getGlobalBadgeCounter().then(
+            (value) => AwesomeNotifications().setGlobalBadgeCounter(value - 1));
+      }
+      Navigator.pushAndRemoveUntil(
+          context,
+          MaterialPageRoute(builder: (_) => Accounts(widget.udata)),
+          (route) => route.isFirst);
+    });
     if (widget.udata['itsid'] == '0') {
       Future(() {
         Navigator.popAndPushNamed(context, '/login');
@@ -134,9 +158,16 @@ class _HomeState extends State<Home> {
   }
 
   @override
+  void dispose() {
+    AwesomeNotifications().actionSink.close();
+    AwesomeNotifications().createdSink.close();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     String itsid = widget.udata['itsid'];
-
+    getQuran();
     return Scaffold(
       appBar: AppBar(
         title: Text('iMSB for Students'),
@@ -147,14 +178,14 @@ class _HomeState extends State<Home> {
         children: [
           Row(
             children: [
-              Expanded(
-                  child: Container(
-                      child: itsid == '0'
-                          ? SizedBox(width: 10.0)
-                          : Image.network(
-                              'https://idaramsb.net/assets/img/itsphoto.php?itsid=$itsid'),
-                      color: Colors.amber,
-                      padding: EdgeInsets.all(5.0))),
+              Container(
+                  child: ElevatedButton(
+                      onPressed: () {
+                        cancelSched();
+                      },
+                      child: Text('Cancel')),
+                  color: Colors.amber,
+                  padding: EdgeInsets.all(20.0)),
               Container(
                   child: ElevatedButton(
                       onPressed: () {
@@ -163,7 +194,19 @@ class _HomeState extends State<Home> {
                       child: Text('Notify')),
                   color: Colors.pinkAccent,
                   padding: EdgeInsets.all(20.0)),
-              Container(color: Colors.grey, padding: EdgeInsets.all(20.0)),
+              Container(
+                  child: ElevatedButton(
+                      onPressed: () async {
+                        NotificationWeekAndTime? pickedSchedule =
+                            await pickSchedule(context);
+
+                        if (pickedSchedule != null) {
+                          createSched(pickedSchedule);
+                        }
+                      },
+                      child: Text('Schedule')),
+                  color: Colors.grey,
+                  padding: EdgeInsets.all(20.0)),
             ],
           ),
           for (var i in actions)

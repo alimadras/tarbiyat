@@ -35,6 +35,8 @@ dependencies:
   sqflite:
   path_provider:
   awesome_notifications: ^0.0.6+10
+  internet_connection_checker: ^0.0.1+3
+
 
 
 

@@ -2,6 +2,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart';
+import 'package:internet_connection_checker/internet_connection_checker.dart';
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tarbiyat/pages/home.dart';
@@ -13,128 +14,123 @@ class Login extends StatefulWidget {
 }
 
 class _LoginState extends State<Login> {
+  bool hasInternet = false;
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   String itsid = "";
   String password = "";
 
   void getData(itsid, password) async {
-    Map udata = {};
-    var url = Uri.parse(
-        'http://139.59.31.87/horizons/cAuth.php?ITSLogin=$itsid&parameter=its_id&param2=password&value2=$password');
-    Response response = await get(url);
-    Map data = jsonDecode(response.body);
-    if (data['status']) {
-      var url1 = Uri.parse(
-          'http://139.59.31.87/horizons/cAuth.php?mumindetails=$itsid');
-      Response response1 = await get(url1);
-      Map data1 = jsonDecode(response1.body);
-      String fullname = data1['NewDataSet']['Table']['Fullname'];
-      _getloc() async {
-        SharedPreferences prefs = await SharedPreferences.getInstance();
-        prefs.reload();
-        String itsid5 = prefs.getString('itsid5') ?? '0';
-        String itsid4 = prefs.getString('itsid4') ?? '0';
-        String itsid3 = prefs.getString('itsid3') ?? '0';
-        String itsid2 = prefs.getString('itsid2') ?? '0';
-        String itsid1 = prefs.getString('itsid') ?? '0';
-        Map mitsid5 = itsid5 != '0' ? jsonDecode(itsid5) : {"itsid": "0"};
-        Map mitsid4 = itsid4 != '0' ? jsonDecode(itsid4) : {"itsid": "0"};
-        Map mitsid3 = itsid3 != '0' ? jsonDecode(itsid3) : {"itsid": "0"};
-        Map mitsid2 = itsid2 != '0' ? jsonDecode(itsid2) : {"itsid": "0"};
-        Map mitsid1 = itsid1 != '0' ? jsonDecode(itsid1) : {"itsid": "0"};
-        String itsidloc = '{"itsid":"$itsid","fullname":"$fullname"}';
-        if (itsid == mitsid5['itsid'] ||
-            itsid == mitsid4['itsid'] ||
-            itsid == mitsid3['itsid'] ||
-            itsid == mitsid2['itsid'] ||
-            itsid == mitsid1['itsid']) {
-          if (itsid == mitsid5['itsid']) {
-            prefs.setString('itsid', itsidloc);
-            prefs.setString('itsid5', itsid1);
-            prefs.reload();
-          }
-          if (itsid == mitsid4['itsid']) {
-            prefs.setString('itsid', itsidloc);
-            prefs.setString('itsid4', itsid1);
-            prefs.reload();
-          }
-          if (itsid == mitsid3['itsid']) {
-            prefs.setString('itsid', itsidloc);
-            prefs.setString('itsid3', itsid1);
-            prefs.reload();
-          }
-          if (itsid == mitsid2['itsid']) {
-            prefs.setString('itsid', itsidloc);
-            prefs.setString('itsid2', itsid1);
-            prefs.reload();
-          }
-          udata = jsonDecode(itsidloc);
-        } else {
-          if (itsid5 == '0') {
-            if (itsid5 == '0' && itsid4 != '0') {
-              itsid5 = itsid4;
-              prefs.setString('itsid5', itsid5);
-              itsid4 = '0';
+    hasInternet = await InternetConnectionChecker().hasConnection;
+    if (hasInternet) {
+      Map udata = {};
+      var url = Uri.parse(
+          'http://139.59.31.87/horizons/cAuth.php?ITSLogin=$itsid&parameter=its_id&param2=password&value2=$password');
+      Response response = await get(url);
+      Map data = jsonDecode(response.body);
+      if (data['status']) {
+        var url1 = Uri.parse(
+            'http://139.59.31.87/horizons/cAuth.php?mumindetails=$itsid');
+        Response response1 = await get(url1);
+        Map data1 = jsonDecode(response1.body);
+        String fullname = data1['NewDataSet']['Table']['Fullname'];
+        _getloc() async {
+          SharedPreferences prefs = await SharedPreferences.getInstance();
+          prefs.reload();
+          List<String> itsidlist = [];
+          String itsidliststring = '[';
+          itsidlist.add(
+              prefs.getString('itsid1') ?? '{"itsid":"0","fullname":"Empty"}');
+          itsidlist.add(
+              prefs.getString('itsid2') ?? '{"itsid":"0","fullname":"Empty"}');
+          itsidlist.add(
+              prefs.getString('itsid3') ?? '{"itsid":"0","fullname":"Empty"}');
+          itsidlist.add(
+              prefs.getString('itsid4') ?? '{"itsid":"0","fullname":"Empty"}');
+          itsidlist.add(
+              prefs.getString('itsid5') ?? '{"itsid":"0","fullname":"Empty"}');
+          String itsidcurrent = '{"itsid":"$itsid","fullname":"$fullname"}';
+          int step1 = 0;
+          for (var l = 0; l < itsidlist.length; l++) {
+            Map itsdet = jsonDecode(itsidlist[l]);
+            if (itsid == itsdet['itsid']) {
+              step1 = 1;
             }
-            if (itsid4 == '0' && itsid3 != '0') {
-              itsid4 = itsid3;
-              prefs.setString('itsid4', itsid4);
-              itsid3 = '0';
+          }
+          //if the user already exists
+          if (step1 == 1) {
+            for (int i = 0; i < itsidlist.length; i++) {
+              Map itsdet = jsonDecode(itsidlist[i]);
+              String itstemp = '';
+              int j = i + 1;
+
+              if (itsid == itsdet['itsid']) {
+                itstemp = itsidlist[0];
+                itsidlist[0] = itsidlist[i];
+                itsidlist[i] = itstemp;
+                prefs.setString('itsid1', itsidlist[0]);
+                prefs.setString('itsid' + j.toString(), itsidlist[i]);
+              }
             }
-            if (itsid3 == '0' && itsid2 != '0') {
-              itsid3 = itsid2;
-              prefs.setString('itsid3', itsid3);
-              itsid2 = '0';
-            }
-            if (itsid2 == '0' && itsid1 != '0') {
-              itsid2 = itsid1;
-              prefs.setString('itsid2', itsid2);
-              itsid1 = '0';
-            }
-            prefs.setString('itsid', itsidloc);
-            udata = jsonDecode(itsidloc);
+            udata = jsonDecode(itsidlist[0]);
           } else {
-            return showDialog(
-              context: context,
-              builder: (ctx) => AlertDialog(
-                title: Text("Accounts full"),
-                content: Text(
-                    "The system has reached the maximum amount of accounts on a single device. Kindly remove one or more accounts to add more."),
-                actions: <Widget>[
-                  ElevatedButton(
-                    onPressed: () {
-                      Navigator.of(context).push(MaterialPageRoute(
-                          builder: (context) => Accounts(udata)));
-                    },
-                    child: Text("OK"),
-                  ),
-                ],
-              ),
-            );
+            if (itsidlist[(itsidlist.length - 1)] ==
+                '{"itsid":"0","fullname":"Empty"}') {
+              for (var m = (itsidlist.length - 1); m > 0; m--) {
+                if (itsidlist[m] == '{"itsid":"0","fullname":"Empty"}' &&
+                    itsidlist[(m - 1)] != '{"itsid":"0","fullname":"Empty"}') {
+                  itsidlist[m] = itsidlist[(m - 1)];
+                  itsidlist[(m - 1)] = '{"itsid":"0","fullname":"Empty"}';
+                  prefs.setString('itsid' + (m + 1).toString(), itsidlist[m]);
+                }
+              }
+              prefs.setString('itsid1', itsidcurrent);
+              udata = jsonDecode(itsidcurrent);
+            } else {
+              return showDialog(
+                context: context,
+                builder: (ctx) => AlertDialog(
+                  title: Text("Accounts full"),
+                  content: Text(
+                      "The system has reached the maximum amount of accounts on a single device. Kindly remove one or more accounts to add more."),
+                  actions: <Widget>[
+                    ElevatedButton(
+                      onPressed: () {
+                        Navigator.of(context).push(MaterialPageRoute(
+                            builder: (context) =>
+                                Accounts(jsonDecode(itsidlist[0]))));
+                      },
+                      child: Text("OK"),
+                    ),
+                  ],
+                ),
+              );
+            }
           }
         }
+
+        _getloc();
+
+        Navigator.pushAndRemoveUntil(
+            context,
+            MaterialPageRoute(builder: (context) => Home(udata)),
+            (route) => route.isFirst);
+      } else {
+        return showDialog(
+          context: context,
+          builder: (ctx) => AlertDialog(
+            title: Text("Invalid Details"),
+            content: Text("ITS ID/Password seems to be incorrect."),
+            actions: <Widget>[
+              ElevatedButton(
+                onPressed: () {
+                  Navigator.of(ctx).pop();
+                },
+                child: Text("OK"),
+              ),
+            ],
+          ),
+        );
       }
-
-      _getloc();
-
-      Navigator.of(context)
-          .push(MaterialPageRoute(builder: (context) => Home(udata)));
-    } else {
-      return showDialog(
-        context: context,
-        builder: (ctx) => AlertDialog(
-          title: Text("Invalid Details"),
-          content: Text("ITS ID/Password seems to be incorrect."),
-          actions: <Widget>[
-            ElevatedButton(
-              onPressed: () {
-                Navigator.of(ctx).pop();
-              },
-              child: Text("OK"),
-            ),
-          ],
-        ),
-      );
     }
   }
 

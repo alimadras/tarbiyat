@@ -9,14 +9,14 @@ class NavDrawer extends StatelessWidget {
 
   void _remloc(context) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    prefs.remove('itsid');
+    prefs.remove('itsid1');
     prefs.reload();
     String itsid5 = prefs.getString('itsid5') ?? '0';
     String itsid4 = prefs.getString('itsid4') ?? '0';
     String itsid3 = prefs.getString('itsid3') ?? '0';
     String itsid2 = prefs.getString('itsid2') ?? '0';
     if (itsid2 != '0') {
-      prefs.setString('itsid', itsid2);
+      prefs.setString('itsid1', itsid2);
       prefs.remove('itsid2');
     }
     if (itsid3 != '0') {
@@ -80,8 +80,10 @@ class NavDrawer extends StatelessWidget {
             leading: Icon(Icons.border_color),
             title: Text('Manage Accounts'),
             onTap: () => {
-              Navigator.of(context).push(
-                  MaterialPageRoute(builder: (context) => Accounts(udata)))
+              Navigator.pushAndRemoveUntil(
+                  context,
+                  MaterialPageRoute(builder: (context) => Accounts(udata)),
+                  (route) => route.isFirst)
             },
           ),
           ListTile(
